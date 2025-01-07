@@ -27,6 +27,7 @@ public class Player extends JPanel implements Runnable {
     private long TimeStartRound;
 
     private boolean canShoot;
+
     private boolean canRespawn;
     private int shootCounter = 0;
     private int liveCounter = 0;
@@ -45,7 +46,7 @@ public class Player extends JPanel implements Runnable {
     private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
-    
+
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
     Thread gameThread1;
@@ -110,14 +111,7 @@ public class Player extends JPanel implements Runnable {
                 }
                 detectPlayerCollision();
             }
-            if (dead) {
-                if (canRespawn) {
-                    stopPlayer();
-                    setPlayerLocation(435, 290);
-                    setAngle(270);
-                    dead = false;
-                }
-            }
+
             startRound();
             spawnUFO();
             updateLives();
@@ -313,13 +307,13 @@ public class Player extends JPanel implements Runnable {
         boolean left;
         int type;
         double angle;
-        int spawnX;
+        int spawnY;
         if (ElapsedTime > 20000) {
             TimeStartRound = System.currentTimeMillis();
             Random random = new Random();
             big = random.nextBoolean();
             left = random.nextBoolean();
-            spawnX = random.nextInt(500);
+            spawnY = random.nextInt(500);
             if (big) {
                 type = 3;
             } else {
@@ -330,7 +324,7 @@ public class Player extends JPanel implements Runnable {
             } else {
                 angle = 0;
             }
-            asteroidsList.add(new Asteroids(type, spawnX+20, 0, angle, 1));
+            asteroidsList.add(new Asteroids(type, 0, spawnY + 20, angle, 1));
         }
     }
 
@@ -416,10 +410,27 @@ public class Player extends JPanel implements Runnable {
             Area asteroidHitbox = new Area(a.getHitBox());
             Area spawnRegion = new Area(getSpawnArea());
             asteroidHitbox.intersect(spawnRegion);
+
+            System.out.println(canRespawn);
+
             if (!asteroidHitbox.isEmpty()) {
-                canRespawn = false;
-            } else {
-                canRespawn =true;
+                a.setCanModifyRespawn(true);
+            } else if (asteroidHitbox.isEmpty()){
+                a.setCanModifyRespawn(false);
+            }
+
+            if (a.isCanModifyRespawn()) {
+
+                for (int j = 0; j< asteroidsList.size(); j++) {
+
+                }
+
+            }
+
+            canRespawn = a.isCanPlayerRespawn();
+
+            if (canRespawn) {
+                respawn();
             }
         }
     }
@@ -463,6 +474,17 @@ public class Player extends JPanel implements Runnable {
             setPlayerLocation(435, 290);
             setAngle(270);
 
+        }
+    }
+
+    private void respawn() {
+        if (dead) {
+            stopPlayer();
+            if (canRespawn) {
+                setPlayerLocation(435, 290);
+                setAngle(270);
+                dead = false;
+            }
         }
     }
 }
