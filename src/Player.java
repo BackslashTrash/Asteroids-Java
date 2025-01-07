@@ -20,7 +20,7 @@ public class Player extends JPanel implements Runnable {
     private int spawnAmount;
     private int score;
 
-    private boolean startRound;
+    private static boolean gameOver;
     private boolean dead;
     private boolean mute;
 
@@ -44,6 +44,7 @@ public class Player extends JPanel implements Runnable {
     private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
+    MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
     Thread gameThread1;
 
@@ -52,6 +53,7 @@ public class Player extends JPanel implements Runnable {
         this.setBackground(Color.LIGHT_GRAY);
         this.setDoubleBuffered(true);
         this.setFocusable(true);
+        this.addMouseListener(mouse);
         this.addKeyListener(keys);
         setPlayerLocation(435, 290);
     }
@@ -85,7 +87,7 @@ public class Player extends JPanel implements Runnable {
 
     public void update() {
         if (!keys.pause) {
-            if (!dead) {
+            if (!dead && !gameOver) {
                 if (keys.up) {
                     accelerate();
                 } else {
@@ -120,6 +122,8 @@ public class Player extends JPanel implements Runnable {
             moveShipOnScreen();
             checkPlayerBounds();
             checkHighScore();
+            detectGameOver();
+            startGame();
             setAngle(angle);
         }
     }
@@ -131,13 +135,14 @@ public class Player extends JPanel implements Runnable {
         AffineTransform refresh = g2D.getTransform();
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        if (!dead) {
+        if (!dead && !gameOver) {
             g2D.translate(x, y);
             AffineTransform myTransform = new AffineTransform();
             myTransform.rotate(Math.toRadians(angle + 90), playerSizeX, playerSizeY);
             g2D.drawImage(scaledPlayer, myTransform, null);
             g2D.setTransform(refresh);
         }
+        showDeathScreen(g2D);
         String scoreText= "Score: "+ score;
         String liveText = "" + lives;
         g2D.setFont(myFont);
@@ -145,6 +150,7 @@ public class Player extends JPanel implements Runnable {
         g2D.drawString(liveText,20,65);
         g2D.setColor(Color.red);
         g2D.draw(getPlayerHitbox());
+        g2D.draw(getSpawnArea());
 
         for (int i = 0; i < playerBullets.size(); i++) {
             Bullets b = playerBullets.get(i);
@@ -383,27 +389,65 @@ public class Player extends JPanel implements Runnable {
         vy = 0;
     }
 
-    private Path2D getSpawnBox() {
+    private Path2D getSpawnPath2D() {
+        Path2D spawnPath2D = new Path2D.Double();
+        spawnPath2D.moveTo(400,250);
+        spawnPath2D.lineTo(450,250);
+        spawnPath2D.lineTo(450, 310);
+        spawnPath2D.lineTo(400,310);
 
-
-        return
+        return spawnPath2D;
     }
 
     private Area getSpawnArea() {
-
-
-        return
+        AffineTransform transform = new AffineTransform();
+        transform.translate(400,250);
+        return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
     private void checkRespawn() {
 
     }
 
-    private void respawn() {
+    private void playSound() {
 
     }
 
-    private void playSound() {
+    private void detectGameOver() {
+        if (lives > 0) {
+            gameOver = false;
+        } else {
+            gameOver = true;
+        }
+    }
 
+    private void showDeathScreen(Graphics g) {
+        if (gameOver) {
+            String playAgain = "Play Again";
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setFont(myFont);
+            g2.drawString(playAgain, 400, 290);
+        }
+    }
+
+    public static boolean isGameOver() {
+        return gameOver;
+    }
+
+    private void startGame() {
+        if (mouse.respawnClicked) {
+            rounds = 0;
+            liveCounter = 0;
+            score = 0;
+            lives = 3;
+            asteroidsList.clear();
+            playerBullets.clear();
+            dead = false;
+            gameOver = false;
+            mouse.respawnClicked = false;
+            setPlayerLocation(435, 290);
+            setAngle(270);
+
+        }
     }
 }
