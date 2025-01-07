@@ -27,6 +27,7 @@ public class Player extends JPanel implements Runnable {
     private long TimeStartRound;
 
     private boolean canShoot;
+    private boolean canRespawn;
     private int shootCounter = 0;
     private int liveCounter = 0;
     private double vx = 0;
@@ -44,6 +45,7 @@ public class Player extends JPanel implements Runnable {
     private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
+    
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
     Thread gameThread1;
@@ -109,9 +111,12 @@ public class Player extends JPanel implements Runnable {
                 detectPlayerCollision();
             }
             if (dead) {
-                stopPlayer();
-                setPlayerLocation(435, 290);
-                dead = false;
+                if (canRespawn) {
+                    stopPlayer();
+                    setPlayerLocation(435, 290);
+                    setAngle(270);
+                    dead = false;
+                }
             }
             startRound();
             spawnUFO();
@@ -124,6 +129,7 @@ public class Player extends JPanel implements Runnable {
             checkHighScore();
             detectGameOver();
             startGame();
+            checkRespawn();
             setAngle(angle);
         }
     }
@@ -391,25 +397,34 @@ public class Player extends JPanel implements Runnable {
 
     private Path2D getSpawnPath2D() {
         Path2D spawnPath2D = new Path2D.Double();
-        spawnPath2D.moveTo(400,250);
-        spawnPath2D.lineTo(450,250);
-        spawnPath2D.lineTo(450, 310);
-        spawnPath2D.lineTo(400,310);
-
+        spawnPath2D.moveTo(428,285);
+        spawnPath2D.lineTo(487,285);
+        spawnPath2D.lineTo(487, 350);
+        spawnPath2D.lineTo(428,350);
         return spawnPath2D;
     }
 
     private Area getSpawnArea() {
         AffineTransform transform = new AffineTransform();
-        transform.translate(400,250);
+        transform.translate(0,0);
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
     private void checkRespawn() {
-
+        for(int i = 0; i < asteroidsList.size(); i++) {
+            Asteroids a = asteroidsList.get(i);
+            Area asteroidHitbox = new Area(a.getHitBox());
+            Area spawnRegion = new Area(getSpawnArea());
+            asteroidHitbox.intersect(spawnRegion);
+            if (!asteroidHitbox.isEmpty()) {
+                canRespawn = false;
+            } else {
+                canRespawn =true;
+            }
+        }
     }
 
-    private void playSound() {
+    private void playSound(String filename) {
 
     }
 

@@ -8,7 +8,7 @@ public class MouseHandler implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (Player.isGameOver()) {
-            if (e.getX() > 340 && e.getX()< 500 && e.getY() > 260 && e.getY() < 370) {
+            if (e.getX() > 340 && e.getX()< 520 && e.getY() > 260 && e.getY() < 370) {
                 respawnClicked = true;
             } else {
                 respawnClicked = false;

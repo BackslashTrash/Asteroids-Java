@@ -115,17 +115,17 @@ public class Asteroids {
     }
 
     public void checkAsteroidBounds() {
-        if (y < -20) {
-            y+= 640;
+        if (y < -15) {
+            y+= 635;
         }
-        if (y > 620) {
-            y -= 640;
+        if (y > 615) {
+            y -= 635;
         }
-        if (x < -20) {
-            x += 940;
+        if (x < -15) {
+            x += 935;
         }
-        if (x > 920) {
-            x -= 940;
+        if (x > 915) {
+            x -= 935;
         }
     }
 
