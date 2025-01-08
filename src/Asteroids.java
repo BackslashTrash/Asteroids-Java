@@ -112,7 +112,7 @@ public class Asteroids {
         Shape hitboxShape = getHitBox();
         g.setTransform(transform);
 
-        g.setColor(Color.red);
+        g.setColor(Color.black);
         g.draw(hitboxShape);
     }
 

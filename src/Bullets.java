@@ -75,14 +75,14 @@ public class Bullets {
     public void drawMe(Graphics2D g) {
         AffineTransform transform = g.getTransform();
         g.translate(x,y);
-        AffineTransform affineTransform = new AffineTransform();
         g.setColor(Color.red);
         g.draw(bulletHitbox);
         Shape shape = getBulletHitbox();
         g.setTransform(transform);
+        Color c=new Color(1f,0f,0f,0f );
 
-//        g.setColor(Color.red);
-//        g.draw(shape);
+        g.setColor(c);
+        g.draw(shape);
     }
     public Area getBulletHitbox() {
         AffineTransform transform = new AffineTransform();

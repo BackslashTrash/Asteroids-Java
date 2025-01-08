@@ -155,9 +155,10 @@ public class Player extends JPanel implements Runnable {
             g2D.setFont(myFont);
             g2D.drawString(scoreText, 20, 40);
             g2D.drawString(liveText, 20, 65);
-            g2D.setColor(Color.red);
-            g2D.draw(getPlayerHitbox());
-            g2D.draw(getSpawnArea());
+            g2D.setColor(Color.black);
+            //g2D.draw(getPlayerHitbox());
+            //g2D.draw(getSpawnArea());
+
 
             for (int i = 0; i < playerBullets.size(); i++) {
                 Bullets b = playerBullets.get(i);
@@ -168,6 +169,7 @@ public class Player extends JPanel implements Runnable {
                 Asteroids a = asteroidsList.get(i);
                 a.drawMe(g2D);
             }
+            g2D.dispose();
         }
         if (!gameRunning) {
             showMenu(g2D);
