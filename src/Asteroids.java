@@ -11,7 +11,6 @@ public class Asteroids {
     private final double angle;
     private final double speed;
 
-    private boolean canModifyRespawn;
     private boolean canPlayerRespawn;
 
 //    private static final double AsteroidImageX = 236/3;
@@ -158,14 +157,6 @@ public class Asteroids {
         transform.translate(x,y);
         transform.rotate(Math.toRadians(angle));
         return new Area(transform.createTransformedShape(hitBox));
-    }
-
-    public boolean isCanModifyRespawn() {
-        return canModifyRespawn;
-    }
-
-    public void setCanModifyRespawn(boolean canModifyRespawn) {
-        this.canModifyRespawn = canModifyRespawn;
     }
 
     public boolean isCanPlayerRespawn() {

@@ -3,7 +3,7 @@ import java.awt.event.MouseListener;
 
 public class MouseHandler implements MouseListener {
 
-    public boolean respawnClicked;
+    public boolean respawnClicked, startGameClicked, muteClicked;
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -13,7 +13,23 @@ public class MouseHandler implements MouseListener {
             } else {
                 respawnClicked = false;
             }
+
+
+
+
         }
+
+        if (!Player.isGameRunning()) {  //menu
+            if (e.getX() > 340 && e.getX()< 520 && e.getY() > 260 && e.getY() < 370) {
+                Player.setGameRunning(true);
+            } else {
+                Player.setGameRunning(true);
+            }
+        }
+
+
+
+
     }
 
     @Override

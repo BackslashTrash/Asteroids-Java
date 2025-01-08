@@ -20,7 +20,10 @@ public class Player extends JPanel implements Runnable {
     private int spawnAmount;
     private int score;
 
+
+    private static boolean gameRunning = false;          //false = menu, true = in-game
     private static boolean gameOver;
+
     private boolean dead;
     private boolean mute;
 
@@ -89,43 +92,46 @@ public class Player extends JPanel implements Runnable {
     }
 
     public void update() {
-        if (!keys.pause) {
-            if (!dead && !gameOver) {
-                if (keys.up) {
-                    accelerate();
-                } else {
-                    slowDown();
-                }
-                if (keys.right) {
-                    angle += 2.5;
-                }
-                if (keys.left) {
-                    angle -= 2.5;
-                }
-                if (keys.shoot) {
-                    if (shootCounter == 0 && canShoot) {
-                        shoot();
-                        keys.shoot = false;
-                        canShoot = false;
+        if (gameRunning) {
+            if (!keys.pause) {
+                if (!dead && !gameOver) {
+                    if (keys.up) {
+                        accelerate();
+                    } else {
+                        slowDown();
                     }
+                    if (keys.right) {
+                        angle += 2.5;
+                    }
+                    if (keys.left) {
+                        angle -= 2.5;
+                    }
+                    if (keys.shoot) {
+                        if (shootCounter == 0 && canShoot) {
+                            shoot();
+                            keys.shoot = false;
+                            canShoot = false;
+                        }
+                    }
+                    detectPlayerCollision();
                 }
-                detectPlayerCollision();
-            }
+                startRound();
+                spawnUFO();
+                updateLives();
+                updateAsteroids();
+                checkBulletState();
+                updateBullets();
+                moveShipOnScreen();
+                checkPlayerBounds();
+                checkHighScore();
+                detectGameOver();
 
-            startRound();
-            spawnUFO();
-            updateLives();
-            updateAsteroids();
-            checkBulletState();
-            updateBullets();
-            moveShipOnScreen();
-            checkPlayerBounds();
-            checkHighScore();
-            detectGameOver();
-            startGame();
-            checkRespawn();
-            setAngle(angle);
+                checkAsteroidListForSpawn();
+                respawn();
+                setAngle(angle);
+            }
         }
+        startGame();
     }
 
     @Override
@@ -135,33 +141,37 @@ public class Player extends JPanel implements Runnable {
         AffineTransform refresh = g2D.getTransform();
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        if (!dead && !gameOver) {
-            g2D.translate(x, y);
-            AffineTransform myTransform = new AffineTransform();
-            myTransform.rotate(Math.toRadians(angle + 90), playerSizeX, playerSizeY);
-            g2D.drawImage(scaledPlayer, myTransform, null);
-            g2D.setTransform(refresh);
-        }
-        showDeathScreen(g2D);
-        String scoreText= "Score: "+ score;
-        String liveText = "" + lives;
-        g2D.setFont(myFont);
-        g2D.drawString(scoreText,20,40);
-        g2D.drawString(liveText,20,65);
-        g2D.setColor(Color.red);
-        g2D.draw(getPlayerHitbox());
-        g2D.draw(getSpawnArea());
+        if (gameRunning) {
+            if (!dead && !gameOver) {
+                g2D.translate(x, y);
+                AffineTransform myTransform = new AffineTransform();
+                myTransform.rotate(Math.toRadians(angle + 90), playerSizeX, playerSizeY);
+                g2D.drawImage(scaledPlayer, myTransform, null);
+                g2D.setTransform(refresh);
+            }
+            showDeathScreen(g2D);
+            String scoreText = "Score: " + score;
+            String liveText = "" + lives;
+            g2D.setFont(myFont);
+            g2D.drawString(scoreText, 20, 40);
+            g2D.drawString(liveText, 20, 65);
+            g2D.setColor(Color.red);
+            g2D.draw(getPlayerHitbox());
+            g2D.draw(getSpawnArea());
 
-        for (int i = 0; i < playerBullets.size(); i++) {
-            Bullets b = playerBullets.get(i);
-            g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5)  );
-            //b.drawMe(g2D);
+            for (int i = 0; i < playerBullets.size(); i++) {
+                Bullets b = playerBullets.get(i);
+                g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
+                //b.drawMe(g2D);
+            }
+            for (int i = 0; i < asteroidsList.size(); i++) {
+                Asteroids a = asteroidsList.get(i);
+                a.drawMe(g2D);
+            }
         }
-        for (int i = 0; i< asteroidsList.size(); i++) {
-            Asteroids a = asteroidsList.get(i);
-            a.drawMe(g2D);
+        if (!gameRunning) {
+            showMenu(g2D);
         }
-
     }
 
     private void setAngle(double angle) {
@@ -404,37 +414,6 @@ public class Player extends JPanel implements Runnable {
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
-    private void checkRespawn() {
-        for(int i = 0; i < asteroidsList.size(); i++) {
-            Asteroids a = asteroidsList.get(i);
-            Area asteroidHitbox = new Area(a.getHitBox());
-            Area spawnRegion = new Area(getSpawnArea());
-            asteroidHitbox.intersect(spawnRegion);
-
-            System.out.println(canRespawn);
-
-            if (!asteroidHitbox.isEmpty()) {
-                a.setCanModifyRespawn(true);
-            } else if (asteroidHitbox.isEmpty()){
-                a.setCanModifyRespawn(false);
-            }
-
-            if (a.isCanModifyRespawn()) {
-
-                for (int j = 0; j< asteroidsList.size(); j++) {
-
-                }
-
-            }
-
-            canRespawn = a.isCanPlayerRespawn();
-
-            if (canRespawn) {
-                respawn();
-            }
-        }
-    }
-
     private void playSound(String filename) {
 
     }
@@ -460,6 +439,14 @@ public class Player extends JPanel implements Runnable {
         return gameOver;
     }
 
+    public static boolean isGameRunning() {
+        return gameRunning;
+    }
+
+    public static void setGameRunning(boolean mybool) {
+        gameRunning = mybool;
+    }
+
     private void startGame() {
         if (mouse.respawnClicked) {
             rounds = 0;
@@ -480,11 +467,40 @@ public class Player extends JPanel implements Runnable {
     private void respawn() {
         if (dead) {
             stopPlayer();
-            if (canRespawn) {
+            if (isSpawnEmpty(asteroidsList)) {
                 setPlayerLocation(435, 290);
                 setAngle(270);
                 dead = false;
             }
         }
     }
+
+    private void showMenu(Graphics g) {
+        Graphics2D g2D = (Graphics2D) g;
+        String startGameText = "Play game";
+        g2D.setFont(myFont);
+        g2D.drawString(startGameText,400,290);
+    }
+
+    private void checkAsteroidListForSpawn() {
+        for(int i = 0; i < asteroidsList.size(); i++) {
+            Asteroids a = asteroidsList.get(i);
+            Area asteroidHitBox = new Area(a.getHitBox());
+            Area spawnRegion = new Area(getSpawnArea());
+            spawnRegion.intersect(asteroidHitBox);
+            a.setCanPlayerRespawn(spawnRegion.isEmpty());
+        }
+    }
+
+    private boolean isSpawnEmpty(ArrayList<Asteroids> arrayList) {
+        for(int i = 0; i < arrayList.size(); i++) {
+            Asteroids a = arrayList.get(i);
+            if (!a.isCanPlayerRespawn()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }
