@@ -48,6 +48,7 @@ public class Player extends JPanel implements Runnable {
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
     File shootSound = new File("laser.wav");
+    File backgroundMusic = new File("background.wav");
 
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
@@ -74,7 +75,11 @@ public class Player extends JPanel implements Runnable {
         double interval = (double) 1000000000 / 120;
         double nanoTime = System.nanoTime() + interval;
         while (gameThread1 != null) {
-            update();
+            try {
+                update();
+            } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+                throw new RuntimeException(e);
+            }
             repaint();
             try {
                 double remain = nanoTime - System.nanoTime();
@@ -90,7 +95,7 @@ public class Player extends JPanel implements Runnable {
         }
     }
 
-    public void update() {
+    public void update() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if (gameRunning) {
             if (!keys.pause) {
                 if (!dead && !gameOver) {
@@ -107,6 +112,9 @@ public class Player extends JPanel implements Runnable {
                     }
                     if (keys.shoot) {
                         if (shootCounter == 0 && canShoot) {
+                            if (!mute) {
+                                playSound(shootSound);
+                            }
                             shoot();
                             keys.shoot = false;
                             canShoot = false;
@@ -124,7 +132,6 @@ public class Player extends JPanel implements Runnable {
                 checkPlayerBounds();
                 checkHighScore();
                 detectGameOver();
-
                 checkAsteroidListForSpawn();
                 respawn();
                 setAngle(angle);

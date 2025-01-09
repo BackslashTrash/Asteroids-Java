@@ -133,8 +133,8 @@ public class Asteroids {
 
     public void move() {
         double angleRad = Math.toRadians(angle);
-        x += Math.cos(angleRad) * speed;
-        y += Math.sin(angleRad) * speed;
+        x += Math.cos(angleRad) * speed + 0.02;
+        y += Math.sin(angleRad) * speed + 0.02;
     }
 
     public double getAsteroidY() {
@@ -232,6 +232,6 @@ public class Asteroids {
 
 
 /*
-"What is the Key to success?"
+"What is the key to success?"
 "CONSISTENCY"
 */
