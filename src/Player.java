@@ -1,3 +1,4 @@
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -7,7 +8,6 @@ import java.awt.geom.Path2D;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
-
 
 public class Player extends JPanel implements Runnable {
     public static final double playerSizeX = (double) 94 / 4;
@@ -20,18 +20,16 @@ public class Player extends JPanel implements Runnable {
     private int spawnAmount;
     private int score;
 
-
     private static boolean gameRunning = false;          //false = menu, true = in-game
     private static boolean gameOver;
 
     private boolean dead;
-    private boolean mute;
+    private static boolean mute =  false;
 
     private long TimeStartRound;
 
     private boolean canShoot;
 
-    private boolean canRespawn;
     private int shootCounter = 0;
     private int liveCounter = 0;
     private double vx = 0;
@@ -49,6 +47,7 @@ public class Player extends JPanel implements Runnable {
     private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
+    File shootSound = new File("laser.wav");
 
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
@@ -149,16 +148,20 @@ public class Player extends JPanel implements Runnable {
                 g2D.drawImage(scaledPlayer, myTransform, null);
                 g2D.setTransform(refresh);
             }
+            if (mouse.menuClicked) {
+                gameRunning = false;
+                mouse.menuClicked = false;
+                showMenu(g2D);
+            }
             showDeathScreen(g2D);
             String scoreText = "Score: " + score;
-            String liveText = "" + lives;
+            String liveText = "Lives: " + lives;
             g2D.setFont(myFont);
             g2D.drawString(scoreText, 20, 40);
             g2D.drawString(liveText, 20, 65);
             g2D.setColor(Color.black);
             //g2D.draw(getPlayerHitbox());
             //g2D.draw(getSpawnArea());
-
 
             for (int i = 0; i < playerBullets.size(); i++) {
                 Bullets b = playerBullets.get(i);
@@ -270,7 +273,7 @@ public class Player extends JPanel implements Runnable {
         }
     }
 
-    public void checkBulletCollision(Asteroids asteroids) {
+    private void checkBulletCollision(Asteroids asteroids) {
         for (int i = 0; i < playerBullets.size(); i++) {
             Bullets bullets = playerBullets.get(i);
             Area bulletArea = bullets.getBulletHitbox();
@@ -370,13 +373,13 @@ public class Player extends JPanel implements Runnable {
             BufferedReader br = new BufferedReader(fr);
             String temp = br.readLine();
             br.close();
-            int storedHighScore = Integer.parseInt(temp);
+            int storedHighscore = Integer.parseInt(temp);
             FileWriter fw = new FileWriter("highscore.txt");
             PrintWriter pw = new PrintWriter(fw);
-            if (score > storedHighScore) {
-                storedHighScore = score;
+            if (score > storedHighscore) {
+                storedHighscore = score;
             }
-            pw.print(storedHighScore);
+            pw.print(storedHighscore);
             pw.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -416,8 +419,11 @@ public class Player extends JPanel implements Runnable {
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
-    private void playSound(String filename) {
-
+    private void playSound(File filename) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+        AudioInputStream inputStream = AudioSystem.getAudioInputStream(filename);
+        Clip clip = AudioSystem.getClip();
+        clip.open(inputStream);
+        clip.start();
     }
 
     private void detectGameOver() {
@@ -430,10 +436,15 @@ public class Player extends JPanel implements Runnable {
 
     private void showDeathScreen(Graphics g) {
         if (gameOver) {
-            String playAgain = "Play Again";
+            String playAgain = "New game";
+            String menu = "Menu";
             Graphics2D g2 = (Graphics2D) g;
             g2.setFont(myFont);
             g2.drawString(playAgain, 400, 290);
+            g2.drawString(menu,430,430);
+            g2.draw(getArea(getStartButton()));
+            g2.draw(getArea(getExitButton()));
+
         }
     }
 
@@ -462,7 +473,6 @@ public class Player extends JPanel implements Runnable {
             mouse.respawnClicked = false;
             setPlayerLocation(435, 290);
             setAngle(270);
-
         }
     }
 
@@ -480,8 +490,28 @@ public class Player extends JPanel implements Runnable {
     private void showMenu(Graphics g) {
         Graphics2D g2D = (Graphics2D) g;
         String startGameText = "Play game";
+        String title = "Asteroids";
+        String soundOn = "Sound: On";
+        String soundOff = "Sound: Off";
+        String exit = "Quit Game";
         g2D.setFont(myFont);
         g2D.drawString(startGameText,400,290);
+        g2D.drawString("High score:"+readHighscore(),360,360);
+        g2D.drawString(exit,400,430);
+        if (!mute) {
+            g2D.drawString(soundOn,400,200);
+        } else {
+            g2D.drawString(soundOff,400,200);
+        }
+        if (mouse.exitClicked) {
+            System.exit(0);
+        }
+        Font titleFont = new Font("Ariel",Font.PLAIN,45);
+        g2D.setFont(titleFont);
+        g2D.drawString(title,370,100);
+        g2D.draw(getArea(getMuteButton()));
+        g2D.draw(getArea(getStartButton()));
+        g2D.draw(getArea(getExitButton()));
     }
 
     private void checkAsteroidListForSpawn() {
@@ -504,5 +534,54 @@ public class Player extends JPanel implements Runnable {
         return true;
     }
 
+    private int readHighscore() {
+        int myScore;
+        try {
+            FileReader fr = new FileReader("highscore.txt");
+            BufferedReader br = new BufferedReader(fr);
+            String temp = br.readLine();
+            myScore = Integer.parseInt(temp);
+            br.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return myScore;
+    }
 
+    private Path2D getMuteButton() {
+        Path2D myPath2D = new Path2D.Double();
+        myPath2D.moveTo(390,170);
+        myPath2D.lineTo(540,170);
+        myPath2D.lineTo(540,210);
+        myPath2D.lineTo(390,210);
+        return myPath2D;
+    }
+
+    private Path2D getStartButton() {
+        Path2D myPath2D = new Path2D.Double();
+        myPath2D.moveTo(390,260);
+        myPath2D.lineTo(540,260);
+        myPath2D.lineTo(540,300);
+        myPath2D.lineTo(390,300);
+        return myPath2D;
+    }
+
+    private Path2D getExitButton() {
+        Path2D myPath2D = new Path2D.Double();
+        myPath2D.moveTo(390,400);
+        myPath2D.lineTo(540,400);
+        myPath2D.lineTo(540,440);
+        myPath2D.lineTo(390,440);
+        return myPath2D;
+    }
+
+    private Area getArea(Path2D path2D) {
+        return new Area(path2D);
+    }
+    public static void setMute(boolean mute) {
+        Player.mute = mute;
+    }
+    public static boolean isMute() {
+        return mute;
+    }
 }
