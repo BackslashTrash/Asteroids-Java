@@ -10,26 +10,26 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Player extends JPanel implements Runnable {
-    public static final double playerSizeX = (double) 94 / 4;
-    public static final double playerSizeY = (double) 105 / 4;
-    private double x = 0;
-    private double y = 0;
+    public static final double playerSizeX = (double) 94 / 4;           //scaled player x size
+    public static final double playerSizeY = (double) 105 / 4;          //scaled player y size
+    private double x = 0;                                                                   //player location
+    private double y = 0;                                                                   //player y
 
-    private int lives = 3;
-    private int rounds;
-    private int spawnAmount;
-    private int score;
+    private int lives = 3;                               //player lives
+    private int rounds;                                 //rounds
+    private int spawnAmount;                     //controls the amount of asteroids that will spawn
+    private int score;                                   //the sore
 
     private static boolean gameRunning = false;          //false = menu, true = in-game
-    private static boolean gameOver;
+    private static boolean gameOver;                        //checks if game is over(lives = 0)
 
-    private boolean dead;
-    private static boolean mute =  false;
+    private boolean dead;                                           //checks if player is dead (gets hit by asteroid)
+    private static volatile boolean mute =  false;       //
 
     private long TimeStartRound;
 
-    private boolean canShoot;
-
+    private boolean canShoot;       //indicate if the player can shoot or not
+    private BackgroundMusic backgroundMusic = new BackgroundMusic();
     private int shootCounter = 0;
     private int liveCounter = 0;
     private double vx = 0;
@@ -47,14 +47,13 @@ public class Player extends JPanel implements Runnable {
     private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
     private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
 
-    File shootSound = new File("laser.wav");
-    File backgroundMusic = new File("background.wav");
+    File laserSound = new File("laser.wav");
 
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
     Thread gameThread1;
 
-    public Player() {
+    public Player() {                       // Init player by setting dimension of the screen, location, adding key listener and mouse listener
         this.setPreferredSize(new Dimension(900, 600));
         this.setBackground(Color.LIGHT_GRAY);
         this.setDoubleBuffered(true);
@@ -65,9 +64,10 @@ public class Player extends JPanel implements Runnable {
     }
 
     public void startThread() {
-        rounds = 0;
-        gameThread1 = new Thread(this);
-        gameThread1.start();
+        rounds = 0;                             //Reset rounds
+        gameThread1 = new Thread(this);     //Add thread
+        gameThread1.start();                         //Start game thread
+        backgroundMusic.startSoundThread(); //Start sound thread
     }
 
     @Override
@@ -113,7 +113,7 @@ public class Player extends JPanel implements Runnable {
                     if (keys.shoot) {
                         if (shootCounter == 0 && canShoot) {
                             if (!mute) {
-                                playSound(shootSound);
+                            initFile(laserSound);
                             }
                             shoot();
                             keys.shoot = false;
@@ -426,12 +426,11 @@ public class Player extends JPanel implements Runnable {
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
-    private void playSound(File filename) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-        AudioInputStream inputStream = AudioSystem.getAudioInputStream(filename);
-        Clip clip = AudioSystem.getClip();
-        clip.open(inputStream);
-        clip.start();
-    }
+//    private void initSound(File filename) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+//        AudioInputStream inputStream = AudioSystem.getAudioInputStream(filename);
+//        clip = AudioSystem.getClip();
+//        clip.open(inputStream);
+//    }
 
     private void detectGameOver() {
         if (lives > 0) {
@@ -582,6 +581,11 @@ public class Player extends JPanel implements Runnable {
         return myPath2D;
     }
 
+
+
+
+
+
     private Area getArea(Path2D path2D) {
         return new Area(path2D);
     }
@@ -590,5 +594,15 @@ public class Player extends JPanel implements Runnable {
     }
     public static boolean isMute() {
         return mute;
+    }
+    public void initFile(File file) {
+        try {
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
+            Clip clip = AudioSystem.getClip();
+            clip.open(inputStream);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

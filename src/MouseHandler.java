@@ -30,6 +30,7 @@ public class MouseHandler implements MouseListener {
             }
             if (e.getX() > 390 && e.getX() < 540 && e.getY() > 170 && e.getY() < 210) {
                 Player.setMute(!Player.isMute());
+
             }
             if (e.getX() > 390 && e.getX() < 540 && e.getY() > 400 && e.getY() <440) {
                 int input = JOptionPane.showConfirmDialog(null, "Confirm exiting program?","Quit Game",JOptionPane.YES_NO_OPTION,JOptionPane.INFORMATION_MESSAGE);
