@@ -14,38 +14,32 @@ public class Player extends JPanel implements Runnable {
     public static final double playerSizeY = (double) 105 / 4;          //scaled player y size
     private double x = 0;                                                                   //player location
     private double y = 0;                                                                   //player y
-
     private int lives = 3;                               //player lives
     private int rounds;                                 //rounds
     private int spawnAmount;                     //controls the amount of asteroids that will spawn
     private int score;                                   //the sore
-
     private static boolean gameRunning = false;          //false = menu, true = in-game
     private static boolean gameOver;                        //checks if game is over(lives = 0)
-
     private boolean dead;                                           //checks if player is dead (gets hit by asteroid)
-    private static volatile boolean mute =  false;       //
-
+    private static boolean mute =  false;       //
     private long TimeStartRound;
-
     private boolean canShoot;       //indicate if the player can shoot or not
     private BackgroundMusic backgroundMusic = new BackgroundMusic();
     private int shootCounter = 0;
-    private int liveCounter = 0;
-    private double vx = 0;
-    private double vy = 0;
+    private int liveCounter = 0;    //to calculate when the player will recieve extra lives
+    private double vx = 0;              //change in x
+    private double vy = 0;              //change in y
     private final double acceleration = 1.8;
     private final double friction = 0.995;
-
     private final Font myFont = new Font("Futura", Font.PLAIN,27);
 
     private ArrayList<Bullets> UFOBullets = new ArrayList<>();
-    private ArrayList<Bullets> playerBullets = new ArrayList<>();
-    private ArrayList<Asteroids> asteroidsList = new ArrayList<>();
+    private ArrayList<Bullets> playerBullets = new ArrayList<>();           //player's bullets
+    private ArrayList<Asteroids> asteroidsList = new ArrayList<>();       //asteroids
 
-    private double angle = 270;
-    private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();
-    private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);
+    private double angle = 270;         //angle the player is facing
+    private final Image player = new ImageIcon(getClass().getResource("Player.png")).getImage();        //player image
+    private final Image scaledPlayer = player.getScaledInstance(94 / 2, 105 / 2, Image.SCALE_SMOOTH);       //scaled player image
 
     File laserSound = new File("laser.wav");
 
@@ -72,7 +66,7 @@ public class Player extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        double interval = (double) 1000000000 / 120;
+        double interval = (double) 1000000000 / 120;            //interval, divide by 120 because 120 frames per second
         double nanoTime = System.nanoTime() + interval;
         while (gameThread1 != null) {
             try {
@@ -82,7 +76,7 @@ public class Player extends JPanel implements Runnable {
             }
             repaint();
             try {
-                double remain = nanoTime - System.nanoTime();
+                double remain = nanoTime - System.nanoTime(); //calculate interval between each update
                 remain = remain / 1000000;
                 if (remain < 0) {
                     remain = 0;
@@ -147,15 +141,15 @@ public class Player extends JPanel implements Runnable {
         AffineTransform refresh = g2D.getTransform();
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        if (gameRunning) {
-            if (!dead && !gameOver) {
-                g2D.translate(x, y);
+        if (gameRunning) {  //draw the game if game is running
+            if (!dead && !gameOver) {       //for player movement
+                g2D.translate(x, y);              //move player to x and y variables
                 AffineTransform myTransform = new AffineTransform();
-                myTransform.rotate(Math.toRadians(angle + 90), playerSizeX, playerSizeY);
+                myTransform.rotate(Math.toRadians(angle + 90), playerSizeX, playerSizeY);       //rotate player to angle + 90 because it starts sideways and I want it to be upright
                 g2D.drawImage(scaledPlayer, myTransform, null);
                 g2D.setTransform(refresh);
             }
-            if (mouse.menuClicked) {
+            if (mouse.menuClicked) {                //if player clicked menu after they lose the game
                 gameRunning = false;
                 mouse.menuClicked = false;
                 showMenu(g2D);
@@ -166,7 +160,7 @@ public class Player extends JPanel implements Runnable {
             g2D.setFont(myFont);
             g2D.drawString(scoreText, 20, 40);
             g2D.drawString(liveText, 20, 65);
-            g2D.setColor(Color.black);
+            //g2D.setColor(Color.black);
             //g2D.draw(getPlayerHitbox());
             //g2D.draw(getSpawnArea());
 
@@ -181,7 +175,7 @@ public class Player extends JPanel implements Runnable {
             }
             g2D.dispose();
         }
-        if (!gameRunning) {
+        if (!gameRunning) {     //show menu if not in game
             showMenu(g2D);
         }
     }
@@ -201,7 +195,7 @@ public class Player extends JPanel implements Runnable {
         y = LocationY;
     }
 
-    private void checkPlayerBounds() {
+    private void checkPlayerBounds() {      //checks bounds,
         if (y < -20) {
             y += 610;
         }
@@ -426,12 +420,6 @@ public class Player extends JPanel implements Runnable {
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
-//    private void initSound(File filename) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
-//        AudioInputStream inputStream = AudioSystem.getAudioInputStream(filename);
-//        clip = AudioSystem.getClip();
-//        clip.open(inputStream);
-//    }
-
     private void detectGameOver() {
         if (lives > 0) {
             gameOver = false;
@@ -581,20 +569,18 @@ public class Player extends JPanel implements Runnable {
         return myPath2D;
     }
 
-
-
-
-
-
     private Area getArea(Path2D path2D) {
         return new Area(path2D);
     }
+
     public static void setMute(boolean mute) {
         Player.mute = mute;
     }
+
     public static boolean isMute() {
         return mute;
     }
+
     public void initFile(File file) {
         try {
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);

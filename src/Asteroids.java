@@ -109,11 +109,10 @@ public class Asteroids {
         g.rotate(Math.toRadians(angle));
         AffineTransform affineTransform = new AffineTransform();
         g.drawImage(scaledImage,affineTransform,null);
-        Shape hitboxShape = getHitBox();
+        //Shape hitboxShape = getHitBox();
         g.setTransform(transform);
-
-        g.setColor(Color.black);
-        g.draw(hitboxShape);
+        //g.setColor(Color.black);
+        //g.draw(hitboxShape);          //show hitbox
     }
 
     public void checkAsteroidBounds() {
@@ -154,7 +153,7 @@ public class Asteroids {
 
     public Area getHitBox() {
         AffineTransform transform = new AffineTransform();
-        transform.translate(x,y);
+        transform.translate(x,y);           //move the hitbox to
         transform.rotate(Math.toRadians(angle));
         return new Area(transform.createTransformedShape(hitBox));
     }

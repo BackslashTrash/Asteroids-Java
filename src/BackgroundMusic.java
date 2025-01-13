@@ -31,7 +31,7 @@ public class BackgroundMusic {
                     sourceDataLine.write(fileBuffer, 0, read);
                 }
             }
-            sourceDataLine.drain();     //release system resource
+            sourceDataLine.drain();     //releases system resource
             sourceDataLine.stop();
             sourceDataLine.close();
         }
