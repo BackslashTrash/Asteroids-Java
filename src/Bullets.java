@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Path2D;
 
 public class Bullets {
@@ -10,13 +9,15 @@ public class Bullets {
     private final double velocity = 5;
     private double angle;
 
-    private Shape bulletShape = new Ellipse2D.Double(x,y,5,5);
     private int bulletTime = 0;
     Area bulletHitbox;
+    private double bx = Player.playerSizeX / 2 + 5;
+    private double by = Player.playerSizeY / 2 + 10;
+
 
     public Bullets(double bulletX, double bulletY, double bulletAngle) {
-        bulletX += Player.playerSizeX / 2 + 5;
-        bulletY += Player.playerSizeY / 2 + 10;
+        bulletX+=bx;
+        bulletY+=by;
         x = bulletX;
         y = bulletY;
         angle = bulletAngle;

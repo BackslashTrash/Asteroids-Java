@@ -24,6 +24,10 @@ public class Player extends JPanel implements Runnable {
     private static boolean mute =  false;       //
     private long TimeStartRound;
     private boolean canShoot;       //indicate if the player can shoot or not
+
+    private double bx = Player.playerSizeX / 2 + 5;
+    private double by = Player.playerSizeY / 2 + 10;
+
     private BackgroundMusic backgroundMusic = new BackgroundMusic();
     private int shootCounter = 0;
     private int liveCounter = 0;    //to calculate when the player will recieve extra lives
@@ -121,7 +125,10 @@ public class Player extends JPanel implements Runnable {
                 updateLives();
                 updateAsteroids();
                 checkBulletState();
-                updateBullets();
+                updateBullets(playerBullets);
+                updateBullets(UFOBullets);
+                detectUFOBullets();
+                UFOShoot();
                 moveShipOnScreen();
                 checkPlayerBounds();
                 checkHighScore();
@@ -167,12 +174,18 @@ public class Player extends JPanel implements Runnable {
             for (int i = 0; i < playerBullets.size(); i++) {
                 Bullets b = playerBullets.get(i);
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
-                //b.drawMe(g2D);
+                b.drawMe(g2D);
             }
             for (int i = 0; i < asteroidsList.size(); i++) {
                 Asteroids a = asteroidsList.get(i);
                 a.drawMe(g2D);
             }
+            for (int i = 0; i < UFOBullets.size(); i++) {
+                Bullets b = UFOBullets.get(i);
+                g2D.fill(new Ellipse2D.Double(b.getBulletX() , b.getBulletY(), 5, 5));
+                b.drawMe(g2D);
+            }
+
             g2D.dispose();
         }
         if (!gameRunning) {     //show menu if not in game
@@ -224,13 +237,13 @@ public class Player extends JPanel implements Runnable {
         playerBullets.add(new Bullets(x, y, angle));
     }
 
-    private void updateBullets() {
-        for (int i = 0; i < playerBullets.size(); i++) {
-            Bullets bullets = playerBullets.get(i);
+    private void updateBullets(ArrayList<Bullets> arrayList) {
+        for (int i = 0; i < arrayList.size(); i++) {
+            Bullets bullets = arrayList.get(i);
             bullets.moveBullet();
             bullets.checkBulletBounds();
             if (bullets.shouldBulletDisappear()) {
-                playerBullets.remove(bullets);
+                arrayList.remove(bullets);
             }
         }
     }
@@ -277,10 +290,7 @@ public class Player extends JPanel implements Runnable {
     private void checkBulletCollision(Asteroids asteroids) {
         for (int i = 0; i < playerBullets.size(); i++) {
             Bullets bullets = playerBullets.get(i);
-            Area bulletArea = bullets.getBulletHitbox();
-            Area asteroidArea = asteroids.getHitBox();
-            bulletArea.intersect(asteroidArea);
-            if (!bulletArea.isEmpty()) {
+            if (collide(bullets.getBulletHitbox(),asteroids.getHitBox())) {
                 if (asteroids.getType() == 0) {
                     splitAsteroids(1,asteroids.getAsteroidX(),asteroids.getAsteroidY());
                     asteroids.setType(1);
@@ -299,7 +309,6 @@ public class Player extends JPanel implements Runnable {
                     asteroidsList.remove(asteroids);
                     score+=1000;
                 }
-
                 asteroidsList.remove(asteroids);
                 playerBullets.remove(bullets);
             }
@@ -390,10 +399,7 @@ public class Player extends JPanel implements Runnable {
     private void detectPlayerCollision() {
         for (int i = 0; i< asteroidsList.size(); i++) {
             Asteroids a = asteroidsList.get(i);
-            Area playerHitbox = new Area(getPlayerHitbox());
-            Area asteroidHitbox = new Area(a.getHitBox());
-            asteroidHitbox.intersect(playerHitbox);
-            if (!asteroidHitbox.isEmpty()) {
+            if (collide(getPlayerHitbox(),a.getHitBox())) {
                 lives--;
                 dead = true;
             }
@@ -511,10 +517,7 @@ public class Player extends JPanel implements Runnable {
     private void checkAsteroidListForSpawn() {
         for(int i = 0; i < asteroidsList.size(); i++) {
             Asteroids a = asteroidsList.get(i);
-            Area asteroidHitBox = new Area(a.getHitBox());
-            Area spawnRegion = new Area(getSpawnArea());
-            spawnRegion.intersect(asteroidHitBox);
-            a.setCanPlayerRespawn(spawnRegion.isEmpty());
+            a.setCanPlayerRespawn(!(collide(a.getHitBox(),getSpawnArea())));
         }
     }
 
@@ -590,5 +593,36 @@ public class Player extends JPanel implements Runnable {
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void UFOShoot() {
+        Random random = new Random();
+        for (int i  = 0; i < asteroidsList.size();i++) {
+            Asteroids a = asteroidsList.get(i);
+            if (a.getType() == 3 || a.getType() == 4) {
+                if (a.getUFOShootCounter() < 200) {
+                    a.setUFOShootCounter(a.getUFOShootCounter() + 1);
+                } else {
+                    int angle = random.nextInt(360);
+                    UFOBullets.add(new Bullets(a.getAsteroidX(), a.getAsteroidY(), angle));
+                    a.setUFOShootCounter(0);
+                }
+            }
+        }
+    }
+
+    private void detectUFOBullets() {
+        for (int i = 0; i < UFOBullets.size(); i++) {
+            Bullets b = UFOBullets.get(i);
+            if (collide(b.getBulletHitbox(),getPlayerHitbox())) {
+                lives--;
+                dead = true;
+            }
+        }
+    }
+
+    private boolean collide(Area a, Area b) {
+        a.intersect(b);
+        return !a.isEmpty();
     }
 }

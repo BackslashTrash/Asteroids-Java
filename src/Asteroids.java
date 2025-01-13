@@ -13,6 +13,9 @@ public class Asteroids {
 
     private boolean canPlayerRespawn;
 
+    private boolean UFOCanShoot;
+    private int UFOShootCounter = 0;
+
 //    private static final double AsteroidImageX = 236/3;
 //    private static final double AsteroidImageY = 211/3;
 
@@ -164,6 +167,14 @@ public class Asteroids {
 
     public void setCanPlayerRespawn(boolean canPlayerRespawn) {
         this.canPlayerRespawn = canPlayerRespawn;
+    }
+
+    public void setUFOShootCounter(int UFOShootCounter) {
+        this.UFOShootCounter = UFOShootCounter;
+    }
+
+    public int getUFOShootCounter() {
+        return UFOShootCounter;
     }
 }
 
