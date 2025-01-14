@@ -17,7 +17,6 @@ public class Asteroids {
 //    private static final double AsteroidImageX = 236/3;
 //    private static final double AsteroidImageY = 211/3;
 
-
     private final Image asteroidImage =  new ImageIcon(getClass().getResource("Asteroid.png")).getImage();
     private Image scaledImage = asteroidImage.getScaledInstance(236/3,211/3,Image.SCALE_SMOOTH);
     private final Image ufoImage =  new ImageIcon(getClass().getResource("UFO.png")).getImage();
@@ -154,8 +153,8 @@ public class Asteroids {
 
     public Area getHitBox() {
         AffineTransform transform = new AffineTransform();
-        transform.translate(x,y);           //move the hitbox to
-        transform.rotate(Math.toRadians(angle));
+        transform.translate(x,y);           //move the hitbox to x and y variable
+        transform.rotate(Math.toRadians(angle));       //change direction
         return new Area(transform.createTransformedShape(hitBox));
     }
 

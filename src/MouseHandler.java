@@ -4,7 +4,7 @@ import java.awt.event.MouseListener;
 
 public class MouseHandler implements MouseListener {
 
-    public boolean respawnClicked, exitClicked, menuClicked, exitEntered;
+    public boolean respawnClicked, exitClicked, menuClicked;
 
     @Override
     public void mouseClicked(MouseEvent e) {

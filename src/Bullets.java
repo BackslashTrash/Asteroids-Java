@@ -62,7 +62,7 @@ public class Bullets {
     }
 
     public boolean shouldBulletDisappear() {
-        if (bulletTime < 100) {
+        if (bulletTime < 100) {     //calculate when should bullet disappear
             bulletTime++;
             return false;
         } else {
