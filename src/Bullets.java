@@ -16,8 +16,10 @@ public class Bullets {
 
 
     public Bullets(double bulletX, double bulletY, double bulletAngle) {
-        bulletX+=bx;
-        bulletY+=by;
+        if (Player.shooter == 0) {
+            bulletX +=bx;
+            bulletY +=by;
+        }
         x = bulletX;
         y = bulletY;
         angle = bulletAngle;

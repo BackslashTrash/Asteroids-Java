@@ -8,13 +8,12 @@ import java.awt.geom.Path2D;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
-
 public class Player extends JPanel implements Runnable {
     public static final double playerSizeX = (double) 94 / 4;           //scaled player x size
     public static final double playerSizeY = (double) 105 / 4;          //scaled player y size
     private double x = 0;                                                                   //player location
     private double y = 0;                                                                   //player y
-    private int lives = 3;                               //player lives
+    private int lives= 9999;                               //player lives
     private int rounds;                                 //rounds
     private int spawnAmount;                     //controls the amount of asteroids that will spawn
     private int score;                                   //the sore
@@ -27,6 +26,8 @@ public class Player extends JPanel implements Runnable {
 
     private double bx = Player.playerSizeX / 2 + 5;
     private double by = Player.playerSizeY / 2 + 10;
+
+    public static int shooter;
 
     private BackgroundMusic backgroundMusic = new BackgroundMusic();
     private int shootCounter = 0;
@@ -176,13 +177,14 @@ public class Player extends JPanel implements Runnable {
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
                 b.drawMe(g2D);
             }
+
             for (int i = 0; i < asteroidsList.size(); i++) {
                 Asteroids a = asteroidsList.get(i);
                 a.drawMe(g2D);
             }
             for (int i = 0; i < UFOBullets.size(); i++) {
                 Bullets b = UFOBullets.get(i);
-                g2D.fill(new Ellipse2D.Double(b.getBulletX() , b.getBulletY(), 5, 5));
+                g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
                 b.drawMe(g2D);
             }
 
@@ -234,6 +236,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void shoot() {
+        shooter = 0;
         playerBullets.add(new Bullets(x, y, angle));
     }
 
@@ -339,15 +342,16 @@ public class Player extends JPanel implements Runnable {
             big = random.nextBoolean();
             left = random.nextBoolean();
             spawnY = random.nextInt(500);
-            if (big) {
-                type = 3;
-            } else {
-                type = 4;
-            }
             if (left) {
                 angle = 180;
             } else {
                 angle = 0;
+            }
+            if (big) {
+                type = 3;
+                angle = 0;
+            } else {
+                type = 4;
             }
             asteroidsList.add(new Asteroids(type, 0, spawnY + 20, angle, 1));
         }
@@ -599,7 +603,7 @@ public class Player extends JPanel implements Runnable {
         Random random = new Random();
         for (int i  = 0; i < asteroidsList.size();i++) {
             Asteroids a = asteroidsList.get(i);
-            if (a.getType() == 3 || a.getType() == 4) {
+            if (a.getType() == 3) {
                 if (a.getUFOShootCounter() < 200) {
                     a.setUFOShootCounter(a.getUFOShootCounter() + 1);
                 } else {
@@ -615,6 +619,7 @@ public class Player extends JPanel implements Runnable {
         for (int i = 0; i < UFOBullets.size(); i++) {
             Bullets b = UFOBullets.get(i);
             if (collide(b.getBulletHitbox(),getPlayerHitbox())) {
+                UFOBullets.remove(b);
                 lives--;
                 dead = true;
             }

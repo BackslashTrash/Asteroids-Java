@@ -12,8 +12,6 @@ public class Asteroids {
     private final double speed;
 
     private boolean canPlayerRespawn;
-
-    private boolean UFOCanShoot;
     private int UFOShootCounter = 0;
 
 //    private static final double AsteroidImageX = 236/3;
