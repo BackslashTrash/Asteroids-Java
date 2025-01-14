@@ -13,7 +13,7 @@ public class Player extends JPanel implements Runnable {
     public static final double playerSizeY = (double) 105 / 4;          //scaled player y size
     private double x = 0;                                                                   //player location
     private double y = 0;                                                                   //player y
-    private int lives= 9999;                               //player lives
+    private int lives= 3;                               //player lives
     private int rounds;                                 //rounds
     private int spawnAmount;                     //controls the amount of asteroids that will spawn
     private int score;                                   //the sore
@@ -31,7 +31,7 @@ public class Player extends JPanel implements Runnable {
 
     private BackgroundMusic backgroundMusic = new BackgroundMusic();
     private int shootCounter = 0;
-    private int liveCounter = 0;    //to calculate when the player will recieve extra lives
+    private int liveCounter = 0;    //to calculate when the player will receive extra lives
     private double vx = 0;              //change in x
     private double vy = 0;              //change in y
     private final double acceleration = 1.8;
@@ -50,11 +50,11 @@ public class Player extends JPanel implements Runnable {
 
     MouseHandler mouse = new MouseHandler();
     KeyHandler keys = new KeyHandler();
-    Thread gameThread1;
+    Thread gameThread1;             //Game thread
 
     public Player() {                       // Init player by setting dimension of the screen, location, adding key listener and mouse listener
         this.setPreferredSize(new Dimension(900, 600));
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.decode("#D9D9D9"));
         this.setDoubleBuffered(true);
         this.setFocusable(true);
         this.addMouseListener(mouse);
@@ -97,7 +97,7 @@ public class Player extends JPanel implements Runnable {
     public void update() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if (gameRunning) {
             if (!keys.pause) {
-                if (!dead && !gameOver) {
+                if (!dead && !gameOver) {               //Keys for controlling the player
                     if (keys.up) {
                         accelerate();
                     } else {
@@ -109,7 +109,7 @@ public class Player extends JPanel implements Runnable {
                     if (keys.left) {
                         angle -= 2.5;
                     }
-                    if (keys.shoot) {
+                    if (keys.shoot) {                   //Shooting
                         if (shootCounter == 0 && canShoot) {
                             if (!mute) {
                             initFile(laserSound);
@@ -163,29 +163,23 @@ public class Player extends JPanel implements Runnable {
                 showMenu(g2D);
             }
             showDeathScreen(g2D);
-            String scoreText = "Score: " + score;
-            String liveText = "Lives: " + lives;
+            String scoreText = "Score: " + score;   //Score text
+            String liveText = "Lives: " + lives;        //Lives text
             g2D.setFont(myFont);
             g2D.drawString(scoreText, 20, 40);
             g2D.drawString(liveText, 20, 65);
-            //g2D.setColor(Color.black);
-            //g2D.draw(getPlayerHitbox());
-            //g2D.draw(getSpawnArea());
-
-            for (int i = 0; i < playerBullets.size(); i++) {
+            for (int i = 0; i < playerBullets.size(); i++) {        //Drawing player's bullets
                 Bullets b = playerBullets.get(i);
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
-                b.drawMe(g2D);
             }
 
-            for (int i = 0; i < asteroidsList.size(); i++) {
+            for (int i = 0; i < asteroidsList.size(); i++) {        //Drawing asteroids
                 Asteroids a = asteroidsList.get(i);
                 a.drawMe(g2D);
             }
-            for (int i = 0; i < UFOBullets.size(); i++) {
+            for (int i = 0; i < UFOBullets.size(); i++) {           //Drawing UFO's bullets
                 Bullets b = UFOBullets.get(i);
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
-                b.drawMe(g2D);
             }
 
             g2D.dispose();
@@ -196,22 +190,22 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void setAngle(double angle) {
-        this.angle = angle % 360;
+        this.angle = angle % 360;       //makes angle always under 360
     }
 
     private void accelerate() {
         double angleRad = Math.toRadians(angle);
-        vx += Math.cos(angleRad) * acceleration / 120;
+        vx += Math.cos(angleRad) * acceleration / 120;      //Trigonometry for moving in directions
         vy += Math.sin(angleRad) * acceleration / 120;
     }
 
     private void setPlayerLocation(int LocationX, int LocationY) {
-        x = LocationX;
+        x = LocationX;      //Used for respawn players
         y = LocationY;
     }
 
-    private void checkPlayerBounds() {      //checks bounds,
-        if (y < -20) {
+    private void checkPlayerBounds() {
+        if (y < -20) {          //Makes the player always stay in bounds
             y += 610;
         }
         if (y > 600) {
@@ -226,22 +220,22 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void moveShipOnScreen() {
-        x += vx;
+        x += vx;            // moves the player
         y += vy;
     }
 
     private void slowDown() {
-        vx *= friction;
+        vx *= friction;     //slows down the player
         vy *= friction;
     }
 
     private void shoot() {
-        shooter = 0;
+        shooter = 0;        //Shoot bullets
         playerBullets.add(new Bullets(x, y, angle));
     }
 
     private void updateBullets(ArrayList<Bullets> arrayList) {
-        for (int i = 0; i < arrayList.size(); i++) {
+        for (int i = 0; i < arrayList.size(); i++) {            //Makes the bullet move for both player and UFO bullets
             Bullets bullets = arrayList.get(i);
             bullets.moveBullet();
             bullets.checkBulletBounds();
@@ -252,7 +246,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void checkBulletState() {
-        if (!canShoot) {
+        if (!canShoot) {            //Add intervals between each shot
             shootCounter++;
         }
         if (shootCounter == 26) {
@@ -262,7 +256,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void updateAsteroids() {
-        for (int i = 0; i < asteroidsList.size(); i++) {
+        for (int i = 0; i < asteroidsList.size(); i++) {        //looping through asteroids arraylist to update it
             Asteroids asteroids = asteroidsList.get(i);
             asteroids.move();
             asteroids.checkAsteroidBounds();
@@ -271,7 +265,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void spawnAsteroids() {
-        Random myRandom = new Random();
+        Random myRandom = new Random();             //spawn asteroids with random direction and speed
         int x = myRandom.nextInt(900);
         int angle = myRandom.nextInt(360);
         double speed = myRandom.nextDouble();
@@ -279,8 +273,8 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void startRound() {
-        if (asteroidsList.isEmpty()) {
-            TimeStartRound = System.currentTimeMillis();
+        if (asteroidsList.isEmpty()) {                  //start next round if no more asteroids
+            TimeStartRound = System.currentTimeMillis();        //time for spawning UFOs
             rounds++;
             liveCounter++;
             spawnAmount = 5 + rounds/3;
@@ -294,7 +288,7 @@ public class Player extends JPanel implements Runnable {
         for (int i = 0; i < playerBullets.size(); i++) {
             Bullets bullets = playerBullets.get(i);
             if (collide(bullets.getBulletHitbox(),asteroids.getHitBox())) {
-                if (asteroids.getType() == 0) {
+                if (asteroids.getType() == 0) {                                                         //split asteroids based on type
                     splitAsteroids(1,asteroids.getAsteroidX(),asteroids.getAsteroidY());
                     asteroids.setType(1);
                     score+=20;
@@ -403,7 +397,7 @@ public class Player extends JPanel implements Runnable {
     private void detectPlayerCollision() {
         for (int i = 0; i< asteroidsList.size(); i++) {
             Asteroids a = asteroidsList.get(i);
-            if (collide(getPlayerHitbox(),a.getHitBox())) {
+            if (collide(getPlayerHitbox(),a.getHitBox())) {             //detect if the player hit the asteroid
                 lives--;
                 dead = true;
             }
@@ -416,7 +410,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private Path2D getSpawnPath2D() {
-        Path2D spawnPath2D = new Path2D.Double();
+        Path2D spawnPath2D = new Path2D.Double();           //Path 2d for spawn region
         spawnPath2D.moveTo(428,285);
         spawnPath2D.lineTo(487,285);
         spawnPath2D.lineTo(487, 350);
@@ -425,13 +419,13 @@ public class Player extends JPanel implements Runnable {
     }
 
     private Area getSpawnArea() {
-        AffineTransform transform = new AffineTransform();
+        AffineTransform transform = new AffineTransform();              //Spawn area
         transform.translate(0,0);
         return new Area(transform.createTransformedShape(getSpawnPath2D()));
     }
 
     private void detectGameOver() {
-        if (lives > 0) {
+        if (lives > 0) {                //Game over if lives below 1
             gameOver = false;
         } else {
             gameOver = true;
@@ -440,14 +434,14 @@ public class Player extends JPanel implements Runnable {
 
     private void showDeathScreen(Graphics g) {
         if (gameOver) {
-            String playAgain = "New game";
+            String playAgain = "New game";              //New game text and Menu text
             String menu = "Menu";
             Graphics2D g2 = (Graphics2D) g;
             g2.setFont(myFont);
             g2.drawString(playAgain, 400, 290);
             g2.drawString(menu,430,430);
-            g2.draw(getArea(getStartButton()));
-            g2.draw(getArea(getExitButton()));
+            g2.draw(getArea(getStartButton()));         //Respawn button
+            g2.draw(getArea(getExitButton()));           //Menu button
 
         }
     }
@@ -460,12 +454,12 @@ public class Player extends JPanel implements Runnable {
         return gameRunning;
     }
 
-    public static void setGameRunning(boolean mybool) {
-        gameRunning = mybool;
+    public static void setGameRunning(boolean myBoolean) {
+        gameRunning = myBoolean;
     }
 
     private void startGame() {
-        if (mouse.respawnClicked) {
+        if (mouse.respawnClicked) {         //respawn button clicked
             rounds = 0;
             liveCounter = 0;
             score = 0;
@@ -482,8 +476,8 @@ public class Player extends JPanel implements Runnable {
 
     private void respawn() {
         if (dead) {
-            stopPlayer();
-            if (isSpawnEmpty(asteroidsList)) {
+            stopPlayer();                                         //stops the player
+            if (isSpawnEmpty(asteroidsList)) {      //check for spawn
                 setPlayerLocation(435, 290);
                 setAngle(270);
                 dead = false;
@@ -492,7 +486,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void showMenu(Graphics g) {
-        Graphics2D g2D = (Graphics2D) g;
+        Graphics2D g2D = (Graphics2D) g;        //menu
         String startGameText = "Play game";
         String title = "Asteroids";
         String soundOn = "Sound: On";
@@ -503,7 +497,7 @@ public class Player extends JPanel implements Runnable {
         g2D.drawString("High score:"+readHighscore(),360,360);
         g2D.drawString(exit,400,430);
         if (!mute) {
-            g2D.drawString(soundOn,400,200);
+            g2D.drawString(soundOn,400,200);        //sound button text
         } else {
             g2D.drawString(soundOff,400,200);
         }
@@ -519,7 +513,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void checkAsteroidListForSpawn() {
-        for(int i = 0; i < asteroidsList.size(); i++) {
+        for(int i = 0; i < asteroidsList.size(); i++) {         //check if an asteroid is in the spawn area
             Asteroids a = asteroidsList.get(i);
             a.setCanPlayerRespawn(!(collide(a.getHitBox(),getSpawnArea())));
         }
@@ -527,8 +521,8 @@ public class Player extends JPanel implements Runnable {
 
     private boolean isSpawnEmpty(ArrayList<Asteroids> arrayList) {
         for(int i = 0; i < arrayList.size(); i++) {
-            Asteroids a = arrayList.get(i);
-            if (!a.isCanPlayerRespawn()) {
+            Asteroids a = arrayList.get(i);                 //check if any asteroid in the list is in the spawn area
+            if (!a.isCanPlayerRespawn()) {                //return false for player respawn if there is any
                 return false;
             }
         }
@@ -536,7 +530,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private int readHighscore() {
-        int myScore;
+        int myScore;                            //score reader and writer
         try {
             FileReader fr = new FileReader("highscore.txt");
             BufferedReader br = new BufferedReader(fr);
@@ -590,7 +584,7 @@ public class Player extends JPanel implements Runnable {
 
     public void initFile(File file) {
         try {
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(file);   //plays the shooting sound
             Clip clip = AudioSystem.getClip();
             clip.open(inputStream);
             clip.start();
@@ -601,7 +595,7 @@ public class Player extends JPanel implements Runnable {
 
     private void UFOShoot() {
         Random random = new Random();
-        for (int i  = 0; i < asteroidsList.size();i++) {
+        for (int i  = 0; i < asteroidsList.size();i++) {            //make the ufo shoot
             Asteroids a = asteroidsList.get(i);
             if (a.getType() == 3) {
                 if (a.getUFOShootCounter() < 200) {
@@ -616,7 +610,7 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void detectUFOBullets() {
-        for (int i = 0; i < UFOBullets.size(); i++) {
+        for (int i = 0; i < UFOBullets.size(); i++) {               //Check if UFO bullets hit the player
             Bullets b = UFOBullets.get(i);
             if (collide(b.getBulletHitbox(),getPlayerHitbox())) {
                 UFOBullets.remove(b);
@@ -626,7 +620,7 @@ public class Player extends JPanel implements Runnable {
         }
     }
 
-    private boolean collide(Area a, Area b) {
+    private boolean collide(Area a, Area b) {           //check collision between hit boxes
         a.intersect(b);
         return !a.isEmpty();
     }

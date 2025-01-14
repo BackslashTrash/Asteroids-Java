@@ -16,7 +16,7 @@ public class Bullets {
 
 
     public Bullets(double bulletX, double bulletY, double bulletAngle) {
-        if (Player.shooter == 0) {
+        if (Player.shooter == 0) {      //Makes the bullets centered in the player
             bulletX +=bx;
             bulletY +=by;
         }
@@ -70,21 +70,13 @@ public class Bullets {
         }
     }
 
-    public double getAngle() {
-        return angle;
-    }
-
-    //Draw hit box
     public void drawMe(Graphics2D g) {
-        AffineTransform transform = g.getTransform();
+        AffineTransform transform = g.getTransform();           //Draws the hit box for testing, not used in game
         g.translate(x,y);
         g.setColor(Color.red);
         g.draw(bulletHitbox);
         Shape shape = getBulletHitbox();
         g.setTransform(transform);
-        Color c=new Color(1f,0f,0f,0f );
-
-        g.setColor(c);
         g.draw(shape);
     }
     public Area getBulletHitbox() {

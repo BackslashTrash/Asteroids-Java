@@ -26,7 +26,7 @@ public class BackgroundMusic {
             sourceDataLine.start();
             byte[] fileBuffer = new byte[4096];         //create buffer
             int read;
-            while ((read = audioInputStream.read(fileBuffer, 0, fileBuffer.length)) != -1) {        //read the buffer
+            while ((read = audioInputStream.read(fileBuffer, 0, fileBuffer.length)) != -1) {        // read the buffer
                 if (!Player.isMute()) {
                     sourceDataLine.write(fileBuffer, 0, read);
                 }
