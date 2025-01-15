@@ -53,7 +53,7 @@ public class Player extends JPanel implements Runnable {
     File laserSound = new File("laser.wav");
 
     MouseHandler mouse = new MouseHandler();
-    KeyHandler keys = new KeyHandler();
+    static KeyHandler keys = new KeyHandler();
     Thread gameThread1;             //Game thread
 
     public Player() {                       // Init player by setting dimension of the screen, location, adding key listener and mouse listener
@@ -166,6 +166,7 @@ public class Player extends JPanel implements Runnable {
                 mouse.menuClicked = false;
                 showMenu(g2D);
             }
+            showPauseScreen(g2D);
             showDeathScreen(g2D);
             String scoreText = "Score: " + score;   //Score text
             String liveText = "Lives: " + lives;        //Lives text
@@ -446,7 +447,6 @@ public class Player extends JPanel implements Runnable {
             g2.drawString(menu,430,430);
             g2.draw(getArea(getStartButton()));         //Respawn button
             g2.draw(getArea(getExitButton()));           //Menu button
-
         }
     }
 
@@ -516,6 +516,7 @@ public class Player extends JPanel implements Runnable {
             g2D.drawString("Left Arrow - Rotate left",40,100);
             g2D.drawString("Right Arrow - Rotate right",40,140);
             g2D.drawString("P - Pause game",40,180);
+            g2D.drawString("Space - Shoot laser",40, 220);
         }
         Font titleFont = new Font("Ariel",Font.PLAIN,45);
         g2D.setFont(titleFont);
@@ -673,10 +674,23 @@ public class Player extends JPanel implements Runnable {
                 }
                 case 2 -> {
                     difficultyText = "Hard";
-                    extraSpeed = 1;
+                    extraSpeed = 0.9;
+                }
+                case 3 -> {
+                    difficultyText = "Asian";
+                    extraSpeed = 2;
                     difficulty = -1;
                 }
             }
+        }
+    }
+
+    private void showPauseScreen(Graphics graphics) {
+        Graphics2D g2 = (Graphics2D) graphics;
+        if (keys.pause) {
+            g2.setFont(myFont);
+            g2.draw(getArea(getExitButton()));
+            g2.drawString("menu",430,430);
         }
     }
 }

@@ -20,6 +20,12 @@ public class MouseHandler implements MouseListener {
             }
         }
 
+        if (Player.keys.pause) {
+            if (e.getX() > 390 && e.getX() < 540 && e.getY() > 400 && e.getY() <440) {     //Bounds for menu button
+                menuClicked = true;
+            }
+        }
+
         if (!Player.isGameRunning()) {  //menu
             if (e.getX() > 390 && e.getX()< 540 && e.getY() > 260 && e.getY() < 300) {
                 Player.setGameRunning(true);            //Bounds for start button
