@@ -4,7 +4,7 @@ import java.awt.event.MouseListener;
 
 public class MouseHandler implements MouseListener {
 
-    public boolean respawnClicked, exitClicked, menuClicked;
+    public boolean respawnClicked, exitClicked, menuClicked, tutorialClicked = false, diffcultyClicked;
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -36,7 +36,12 @@ public class MouseHandler implements MouseListener {
                     exitClicked = true;             //Bounds for exit button
                 }
             }
-
+            if (e.getX() > 330 && e.getX() < 370 && e.getY() > 260 && e.getY() < 300) {
+                tutorialClicked = !tutorialClicked;
+            }
+            if (e.getX() > 560 && e.getX() < 710 && e.getY() > 260 && e.getY() < 300) {
+                diffcultyClicked = true;
+            }
         }
 
     }

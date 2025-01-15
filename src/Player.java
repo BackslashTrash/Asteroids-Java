@@ -23,6 +23,8 @@ public class Player extends JPanel implements Runnable {
     private static boolean mute =  false;       //
     private long TimeStartRound;
     private boolean canShoot;       //indicate if the player can shoot or not
+    private double extraSpeed = 0.4;
+
 
     private double bx = Player.playerSizeX / 2 + 5;
     private double by = Player.playerSizeY / 2 + 10;
@@ -37,6 +39,8 @@ public class Player extends JPanel implements Runnable {
     private final double acceleration = 1.8;
     private final double friction = 0.995;
     private final Font myFont = new Font("Futura", Font.PLAIN,27);
+    private int difficulty = 1;
+    private String difficultyText = "Normal";
 
     private ArrayList<Bullets> UFOBullets = new ArrayList<>();
     private ArrayList<Bullets> playerBullets = new ArrayList<>();           //player's bullets
@@ -314,10 +318,10 @@ public class Player extends JPanel implements Runnable {
 
     private void splitAsteroids(int type, double x, double y) {
         Random myRandom = new Random();
-        double speed = myRandom.nextDouble() + 0.4;
+        double speed = myRandom.nextDouble() + extraSpeed;
         int angle = myRandom.nextInt(360);
         asteroidsList.add(new Asteroids(type,x,y,angle, speed));
-        speed = myRandom.nextDouble() + 0.4;
+        speed = myRandom.nextDouble() + extraSpeed;
         angle = myRandom.nextInt(360);
         asteroidsList.add(new Asteroids(type,x,y,angle, speed));
     }
@@ -492,10 +496,13 @@ public class Player extends JPanel implements Runnable {
         String soundOn = "Sound: On";
         String soundOff = "Sound: Off";
         String exit = "Quit Game";
+        changeDifficulty();
         g2D.setFont(myFont);
         g2D.drawString(startGameText,400,290);
         g2D.drawString("High score:"+readHighscore(),360,360);
         g2D.drawString(exit,400,430);
+        g2D.drawString("?", 342,290);
+        g2D.drawString("Mode: " + difficultyText, 570, 290);
         if (!mute) {
             g2D.drawString(soundOn,400,200);        //sound button text
         } else {
@@ -504,12 +511,20 @@ public class Player extends JPanel implements Runnable {
         if (mouse.exitClicked) {
             System.exit(0);
         }
+        if(mouse.tutorialClicked) {
+            g2D.drawString("Up Arrow - Accelerate", 40,60);
+            g2D.drawString("Left Arrow - Rotate left",40,100);
+            g2D.drawString("Right Arrow - Rotate right",40,140);
+            g2D.drawString("P - Pause game",40,180);
+        }
         Font titleFont = new Font("Ariel",Font.PLAIN,45);
         g2D.setFont(titleFont);
         g2D.drawString(title,370,100);
         g2D.draw(getArea(getMuteButton()));
         g2D.draw(getArea(getStartButton()));
         g2D.draw(getArea(getExitButton()));
+        g2D.draw(getArea(getTutorialButton()));
+        g2D.draw(getArea(getDifficultyButton()));
     }
 
     private void checkAsteroidListForSpawn() {
@@ -522,7 +537,7 @@ public class Player extends JPanel implements Runnable {
     private boolean isSpawnEmpty(ArrayList<Asteroids> arrayList) {
         for(int i = 0; i < arrayList.size(); i++) {
             Asteroids a = arrayList.get(i);                 //check if any asteroid in the list is in the spawn area
-            if (!a.isCanPlayerRespawn()) {                //return false for player respawn if there is any
+            if (!a.isCanPlayerRespawn()) {                //return false for can player respawn if there is any
                 return false;
             }
         }
@@ -567,6 +582,24 @@ public class Player extends JPanel implements Runnable {
         myPath2D.lineTo(540,400);
         myPath2D.lineTo(540,440);
         myPath2D.lineTo(390,440);
+        return myPath2D;
+    }
+
+    private Path2D getTutorialButton() {
+        Path2D myPath2D = new Path2D.Double();
+        myPath2D.moveTo(330,260);
+        myPath2D.lineTo(370,260);
+        myPath2D.lineTo(370,300);
+        myPath2D.lineTo(330,300);
+        return myPath2D;
+    }
+
+    private Path2D getDifficultyButton() {
+        Path2D myPath2D = new Path2D.Double();
+        myPath2D.moveTo(560,260);
+        myPath2D.lineTo(750,260);
+        myPath2D.lineTo(750,300);
+        myPath2D.lineTo(560,300);
         return myPath2D;
     }
 
@@ -623,5 +656,27 @@ public class Player extends JPanel implements Runnable {
     private boolean collide(Area a, Area b) {           //check collision between hit boxes
         a.intersect(b);
         return !a.isEmpty();
+    }
+
+    private void changeDifficulty() {
+        if (mouse.diffcultyClicked) {
+            difficulty++;
+            mouse.diffcultyClicked = false;
+            switch (difficulty) {
+                case 0 -> {
+                    difficultyText = "Easy";
+                    extraSpeed = 0.1;
+                }
+                case 1 -> {
+                    difficultyText = "Normal";
+                    extraSpeed = 0.4;
+                }
+                case 2 -> {
+                    difficultyText = "Hard";
+                    extraSpeed = 1;
+                    difficulty = -1;
+                }
+            }
+        }
     }
 }

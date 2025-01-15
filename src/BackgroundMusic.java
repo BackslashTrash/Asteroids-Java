@@ -10,15 +10,15 @@ public class BackgroundMusic {
         backgroundMusic = new File("background.wav");
         replay = new Thread(() -> {         //Separate thread so it won't stop the game thread from updating
             try {
-                playBGM();                          //Plays the background music
+                play(backgroundMusic);                          //Plays the background music
             } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
-    public void playBGM() throws UnsupportedAudioFileException, IOException, LineUnavailableException  {
+    public void play(File file) throws UnsupportedAudioFileException, IOException, LineUnavailableException  {
         while (run) {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(backgroundMusic);       //makes an audioinputstream to capture sound from file
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);       //makes an audioinputstream to capture sound from file
             AudioFormat audioFormat = audioInputStream.getFormat();
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
             SourceDataLine sourceDataLine = (SourceDataLine) AudioSystem.getLine(info);
