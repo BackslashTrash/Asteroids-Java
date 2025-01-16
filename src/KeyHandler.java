@@ -12,19 +12,19 @@ public class KeyHandler implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_UP){
+        if (code == KeyEvent.VK_UP){        //Up Arrow
             up = true;
         }
-        if (code == KeyEvent.VK_P){
+        if (code == KeyEvent.VK_P){           //P
             pause = !pause;
         }
-        if (code == KeyEvent.VK_LEFT){
+        if (code == KeyEvent.VK_LEFT){     //Left arrow
             left = true;
         }
-        if (code == KeyEvent.VK_RIGHT){
+        if (code == KeyEvent.VK_RIGHT){   //Right arrow
             right = true;
         }
-        if (code == KeyEvent.VK_SPACE) {
+        if (code == KeyEvent.VK_SPACE) {    //Space
             shoot = true;
         }
     }

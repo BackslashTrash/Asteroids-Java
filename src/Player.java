@@ -26,10 +26,6 @@ public class Player extends JPanel implements Runnable {
     private boolean canShoot;       //indicate if the player can shoot or not
     private double extraSpeed = 0.4;
 
-
-    private double bx = Player.playerSizeX / 2 + 5;
-    private double by = Player.playerSizeY / 2 + 10;
-
     public static int shooter;
 
     private BackgroundMusic backgroundMusic = new BackgroundMusic();
@@ -53,7 +49,7 @@ public class Player extends JPanel implements Runnable {
 
     File laserSound = new File("laser.wav");
 
-    MouseHandler mouse = new MouseHandler();
+    public static MouseHandler mouse = new MouseHandler();
     static KeyHandler keys = new KeyHandler();
     Thread gameThread1;             //Game thread
 
@@ -504,6 +500,8 @@ public class Player extends JPanel implements Runnable {
         g2D.drawString(exit,400,430);
         g2D.drawString("?", 342,290);
         g2D.drawString("Mode: " + difficultyText, 570, 290);
+        g2D.drawString("Developed by Jiawei Tang", 30,570);
+        g2D.drawString("→" ,338,198);
         if (!mute) {
             g2D.drawString(soundOn,400,200);        //sound button text
         } else {
@@ -527,6 +525,7 @@ public class Player extends JPanel implements Runnable {
         g2D.draw(getArea(getExitButton()));
         g2D.draw(getArea(getTutorialButton()));
         g2D.draw(getArea(getDifficultyButton()));
+        g2D.draw(getArea(getShuffleButton()));
     }
 
     private void checkAsteroidListForSpawn() {
@@ -605,6 +604,15 @@ public class Player extends JPanel implements Runnable {
         return myPath2D;
     }
 
+    private Path2D getShuffleButton() {
+        Path2D p = new Path2D.Double();
+        p.moveTo(330,170);
+        p.lineTo(370,170);
+        p.lineTo(370, 210);
+        p.lineTo(330,210);
+        return p;
+    }
+
     private Area getArea(Path2D path2D) {
         return new Area(path2D);
     }
@@ -661,9 +669,9 @@ public class Player extends JPanel implements Runnable {
     }
 
     private void changeDifficulty() {
-        if (mouse.diffcultyClicked) {
+        if (mouse.difficultyClicked) {
             difficulty++;
-            mouse.diffcultyClicked = false;
+            mouse.difficultyClicked = false;
             switch (difficulty) {
                 case 0 -> {
                     difficultyText = "Easy";
