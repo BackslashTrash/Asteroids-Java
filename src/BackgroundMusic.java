@@ -3,23 +3,18 @@ import java.io.File;
 import java.io.IOException;
 
 public class BackgroundMusic {
-    File backgroundMusic;
-    File skyHigh;
-    File higher;
-    File energy;
-    File ymca;
     boolean run = true;
     Thread replay;
     File[] musicList;
     public static int index = 0;
     public BackgroundMusic() {
-        backgroundMusic = new File("background.wav");
-        skyHigh =  new File("skyhigh.wav");
-        higher = new File("higher.wav");
-        energy = new File("energy.wav");
-        ymca = new File("ymca.wav");
+        File awakening = new File("awakening.wav");
+        File skyHigh =  new File("skyhigh.wav");
+        File higher = new File("higher.wav");
+        File energy = new File("energy.wav");
+        File ymca = new File("ymca.wav");
         musicList = new File[5];
-        musicList[0] = backgroundMusic;
+        musicList[0] = awakening;
         musicList[1] =  skyHigh;
         musicList[2] = higher;
         musicList[3] = energy;
@@ -46,15 +41,22 @@ public class BackgroundMusic {
 
             while ((read = audioInputStream.read(fileBuffer, 0, fileBuffer.length)) != -1) {        // read the buffer
                 if (!Player.isMute()) {
-                    if (!Player.mouse.shuffleClicked) {
-                        sourceDataLine.write(fileBuffer, 0, read);
-                    } else {
+                    if (Player.mouse.lastSong) {
                         reset(sourceDataLine);
-                        index ++;
-                        if (index == 5) {
+                        index--;
+                        if (index < 0) {                    //cycling the songs by going down the array
+                            index = 4;
+                        }
+                        Player.mouse.lastSong = false;
+                    } else if (Player.mouse.nextSong){
+                        reset(sourceDataLine);
+                        index++;
+                        if (index > 4) {                   //cycling the songs by going up the array
                             index = 0;
                         }
-                        Player.mouse.shuffleClicked = false;
+                        Player.mouse.nextSong = false;
+                    } else {
+                        sourceDataLine.write(fileBuffer, 0, read);
                     }
                 } else {
                     reset(sourceDataLine);

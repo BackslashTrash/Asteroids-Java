@@ -488,24 +488,21 @@ public class Player extends JPanel implements Runnable {
 
     private void showMenu(Graphics g) {
         Graphics2D g2D = (Graphics2D) g;        //menu
-        String startGameText = "Play game";
-        String title = "Asteroids";
-        String soundOn = "Sound: On";
-        String soundOff = "Sound: Off";
-        String exit = "Quit Game";
         changeDifficulty();
         g2D.setFont(myFont);
-        g2D.drawString(startGameText,400,290);
+        g2D.drawString("Play game",400,290);
         g2D.drawString("High score:"+readHighscore(),360,360);
-        g2D.drawString(exit,400,430);
+        g2D.drawString("Quit Game",400,430);
         g2D.drawString("?", 342,290);
         g2D.drawString("Mode: " + difficultyText, 570, 290);
         g2D.drawString("Developed by Jiawei Tang", 30,570);
-        g2D.drawString("→" ,338,198);
+        g2D.drawString("←" ,338,198);
+        g2D.drawString("→", 568,198);
+
         if (!mute) {
-            g2D.drawString(soundOn,400,200);        //sound button text
+            g2D.drawString("Sound: On",400,200);        //sound button text
         } else {
-            g2D.drawString(soundOff,400,200);
+            g2D.drawString("Sound: Off",400,200);
         }
         if (mouse.exitClicked) {
             System.exit(0);
@@ -519,13 +516,16 @@ public class Player extends JPanel implements Runnable {
         }
         Font titleFont = new Font("Ariel",Font.PLAIN,45);
         g2D.setFont(titleFont);
-        g2D.drawString(title,370,100);
+        g2D.drawString("Asteroids",370,100);
+        g2D.setFont(new Font("Futura",Font.PLAIN,16));
+        g2D.drawString("Currently Playing: " + getCurrentPlayingText(),530,560);
         g2D.draw(getArea(getMuteButton()));
         g2D.draw(getArea(getStartButton()));
         g2D.draw(getArea(getExitButton()));
         g2D.draw(getArea(getTutorialButton()));
         g2D.draw(getArea(getDifficultyButton()));
-        g2D.draw(getArea(getShuffleButton()));
+        g2D.draw(getArea(getLastButton()));
+        g2D.draw(getArea(getNextButton()));
     }
 
     private void checkAsteroidListForSpawn() {
@@ -604,7 +604,16 @@ public class Player extends JPanel implements Runnable {
         return myPath2D;
     }
 
-    private Path2D getShuffleButton() {
+    private Path2D getNextButton() {
+        Path2D p = new Path2D.Double();
+        p.moveTo(560,170);
+        p.lineTo(600,170);
+        p.lineTo(600, 210);
+        p.lineTo(560,210);
+        return p;
+    }
+
+    private Path2D getLastButton() {
         Path2D p = new Path2D.Double();
         p.moveTo(330,170);
         p.lineTo(370,170);
@@ -701,5 +710,28 @@ public class Player extends JPanel implements Runnable {
             g2.draw(getArea(getExitButton()));
             g2.drawString("menu",430,430);
         }
+    }
+
+    private String getCurrentPlayingText() {
+        if (!mute) {
+            switch (BackgroundMusic.index) {
+                case 0 -> {
+                    return "Defqwop - Awakening";
+                }
+                case 1 -> {
+                    return "Elektronomia - Sky High";
+                }
+                case 2 -> {
+                    return "Tobu - Higher";
+                }
+                case 3 -> {
+                    return "Elektronomia - Energy";
+                }
+                case 4 -> {
+                    return "Village People - Y.M.C.A.";
+                }
+            }
+        }
+        return "Muted";
     }
 }

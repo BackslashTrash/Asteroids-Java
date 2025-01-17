@@ -4,7 +4,7 @@ import java.awt.event.MouseListener;
 
 public class MouseHandler implements MouseListener {
 
-    public boolean respawnClicked, exitClicked, menuClicked, tutorialClicked = false, difficultyClicked, shuffleClicked = false;
+    public boolean respawnClicked, exitClicked, menuClicked, tutorialClicked = false, difficultyClicked, lastSong = false, nextSong = false;
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -36,7 +36,10 @@ public class MouseHandler implements MouseListener {
                 Player.setMute(!Player.isMute());
             }
             if (e.getX() > 330 && e.getX() < 370 && e.getY() > 170 && e.getY() < 210) {
-                shuffleClicked = true;
+                lastSong = true;
+            }
+            if (e.getX() > 560 && e.getX() < 600 && e.getY() > 170 && e.getY() < 210) {
+                nextSong = true;
             }
 
 
