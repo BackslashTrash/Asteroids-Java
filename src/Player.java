@@ -179,6 +179,7 @@ public class Player extends JPanel implements Runnable {
                 Asteroids a = asteroidsList.get(i);
                 a.drawMe(g2D);
             }
+
             for (int i = 0; i < UFOBullets.size(); i++) {           //Drawing UFO's bullets
                 Bullets b = UFOBullets.get(i);
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
@@ -251,7 +252,7 @@ public class Player extends JPanel implements Runnable {
         if (!canShoot) {            //Add intervals between each shot
             shootCounter++;
         }
-        if (shootCounter == 26) {
+        if (shootCounter == 20) {       //default = 26 or 20
             shootCounter = 0;
             canShoot = true;
         }

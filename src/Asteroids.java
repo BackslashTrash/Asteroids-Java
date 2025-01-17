@@ -173,6 +173,10 @@ public class Asteroids {
     public int getUFOShootCounter() {
         return UFOShootCounter;
     }
+
+    public double getAngle() {
+        return angle;
+    }
 }
 
 
