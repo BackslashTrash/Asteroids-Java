@@ -730,6 +730,9 @@ public class Player extends JPanel implements Runnable {
                 case 4 -> {
                     return "Village People - Y.M.C.A.";
                 }
+                case 5 -> {
+                    return "FEWZ - Mystic Tides";
+                }
             }
         }
         return "Muted";

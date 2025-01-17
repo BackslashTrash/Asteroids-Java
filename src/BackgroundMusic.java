@@ -13,12 +13,14 @@ public class BackgroundMusic {
         File higher = new File("higher.wav");
         File energy = new File("energy.wav");
         File ymca = new File("ymca.wav");
-        musicList = new File[5];
+        File mystictides = new File("mystictides.wav");
+        musicList = new File[6];
         musicList[0] = awakening;
         musicList[1] =  skyHigh;
         musicList[2] = higher;
         musicList[3] = energy;
         musicList[4] = ymca;
+        musicList[5] = mystictides;
         
         replay = new Thread(() -> {         //Separate thread so it won't stop the game thread from updating
             try {
@@ -51,7 +53,7 @@ public class BackgroundMusic {
                     } else if (Player.mouse.nextSong){
                         reset(sourceDataLine);
                         index++;
-                        if (index > musicList.length) {                   //cycling the songs by going up the array
+                        if (index > musicList.length-1) {                   //cycling the songs by going up the array
                             index = 0;
                         }
                         Player.mouse.nextSong = false;
