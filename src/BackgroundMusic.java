@@ -45,13 +45,13 @@ public class BackgroundMusic {
                         reset(sourceDataLine);
                         index--;
                         if (index < 0) {                    //cycling the songs by going down the array
-                            index = 4;
+                            index = musicList.length -1;
                         }
                         Player.mouse.lastSong = false;
                     } else if (Player.mouse.nextSong){
                         reset(sourceDataLine);
                         index++;
-                        if (index > 4) {                   //cycling the songs by going up the array
+                        if (index > musicList.length) {                   //cycling the songs by going up the array
                             index = 0;
                         }
                         Player.mouse.nextSong = false;
