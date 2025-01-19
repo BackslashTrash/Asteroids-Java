@@ -170,6 +170,11 @@ public class Player extends JPanel implements Runnable {
             g2D.setFont(myFont);
             g2D.drawString(scoreText, 20, 40);
             g2D.drawString(liveText, 20, 65);
+
+//            g2D.setColor(Color.red);                                //shows hitbox, can be removed
+//            g2D.draw(getArea(getSpawnPath2D()));
+//            g2D.draw(getPlayerHitbox());
+
             for (int i = 0; i < playerBullets.size(); i++) {        //Drawing player's bullets
                 Bullets b = playerBullets.get(i);
                 g2D.fill(new Ellipse2D.Double(b.getBulletX(), b.getBulletY(), 5, 5));
